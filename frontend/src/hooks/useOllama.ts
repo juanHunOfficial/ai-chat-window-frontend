@@ -5,8 +5,11 @@ import { ToolType } from '@/components/ToolSelector';
 interface OllamaResponse {
   model: string;
   created_at: string;
-  response: string;
   done: boolean;
+  message: {
+    role: 'assistant';
+    content: string;
+  };
 }
 
 const modelMap: Record<ToolType, string> = {
@@ -27,14 +30,16 @@ export const useOllama = () => {
       const model = modelMap[tool];
       console.log(`Sending message to Ollama with model: ${model}`);
       
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch('http://34.237.131.224:11434/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           model: model,
-          prompt: message,
+          messages: [
+            { role: 'user', content: message }
+          ],
           stream: false
         })
       });
@@ -44,12 +49,9 @@ export const useOllama = () => {
       }
 
       const data: OllamaResponse = await response.json();
-      return data.response;
+      return data.message.content.trim();
     } catch (error) {
       console.error('Error connecting to Ollama:', error);
-      
-      // Return a mock response for development/demo purposes
-      return `I'm simulating a response from the ${tool} model. To connect to your actual Ollama instance, make sure it's running on localhost:11434 and the CORS settings allow browser requests. Your message was: "${message}"`;
     } finally {
       setIsLoading(false);
     }
