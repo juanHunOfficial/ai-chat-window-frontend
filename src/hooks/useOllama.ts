@@ -24,7 +24,7 @@ export const useOllama = () => {
       const model = modelMap[tool];
       console.log(`Sending message to Ollama with model: ${model}`);
 
-      const response = await fetch('http://localhost:8000/api', {
+      const response = await fetch('http://23.20.90.91:8000/api', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
